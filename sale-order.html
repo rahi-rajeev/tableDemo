@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Life Compass Shopping</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+		<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css" />
+		<link rel="stylesheet" type="text/css" href="assets/css/global.css" />
+		<link rel="stylesheet" type="text/css" href="assets/css/select.css" />
+		<link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+		<link rel="stylesheet" href="http://ui-grid.info/release/ui-grid-unstable.css" type="text/css">
+		<!-- <link rel="stylesheet" type="text/css" href="assets/css/ui-grid-unstable.css"> -->
+		<!--[if IE]>
+		<link rel="stylesheet" type="text/css" href="assets/css/ie.css" />
+		<![endif]-->
+		<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+		<script src="assets/lib/angular/jquery-ui.min.js"></script>
+		<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="assets/js/jquery.dd.min.js"></script>
+		<script src="assets/lib/angular/angular.js"></script>
+		<script src="assets/js/App/Directive/pagination.js"></script>
+		<script src="assets/lib/angular/ui-grid.min.js"></script>
+		<script src="assets/lib/angular/draggable-rows.js"></script>
+		<style>
+			.ui-grid-menu-button {
+				height: 31px;
+			}
+			.addRowTemplate {
+				display: inline-block;
+				padding: 0 10px;
+				width: 33%;
+			}
+			.addRowInput {
+				margin-left: 26px;
+				width: auto;
+			}
+			.grid {
+				width: 100%;
+			}
+			.ui-grid-draggable-row-target {
+				opacity: 0.5 !important;
+			}
+			.ui-grid-draggable-row {
+				height: 30px;
+			}
+			.ui-grid-draggable-row-over {
+				position: relative;
+			}
+			.ui-grid-draggable-row-over:before {
+				content: "";
+				display: block;
+				position: absolute;
+				left: 0;
+				width: 100%;
+				border-bottom: 1px dotted #AAA;
+			}
+			.ui-grid-draggable-row-over--above:before {
+				top: 0;
+			}
+			.ui-grid-draggable-row-over--below:before {
+				bottom: 0;
+			}
+
+			.ui-grid-menu-items li {
+				display: block !important;
+			}
+		</style>
+	</head>
+	<body ng-app="tableApp" ng-controller="tableController">
+		<!-- Header Section Start -->
+		<header ng-include="'assets/js/App/View/header.html'"></header>
+		<!-- Content section start -->
+		<div class="content-wrapper">
+			<!-- Left Sidebar start -->
+			<aside id="left-sidebar" class="expand" ng-include="'assets/js/App/View/leftSideBar.html'"></aside>
+			<!-- Content start here -->
+			<section class="content">
+				<div class="content-heading">
+					<h2 class="seller-heading pull-left"><span>Request Discount</span>Order Order (3 of 3)</h2>
+				</div>
+				<div class="content-section">
+					<div class="detail-box">
+						<!-- Table section start -->
+						<div class="order-header clearfix">
+							<ul class="order-tab">
+								<li class="active">
+									<a href="#create-sale-order" data-toggle="tab" ng-click="enableTab('active')"> Active </a>
+								</li>
+								<li>
+									<a href="#create-sale-all" data-toggle="tab" ng-click="enableTab('all')"> All </a>
+								</li>
+								<li class="add-filter">
+									<a href="#filter-data" data-toggle="tab" ng-click="enableTab('filter')">Add filter</a>
+								</li>
+							</ul>
+						</div>
+						<div class="tab-content order-tab-content">
+							<div id="create-sale-order" class="tab-pane fade in active">
+								<!----- table active select button panel------->
+								<div class="select-tag-btn" ng-if="tableSelectBtnConfig">
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectAllColumnFunActive('select')">Select All</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectAllColumnFunActive('unselect')">Unselect All</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectVisibleColumnsActive('visible')">Select Visible</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectVisibleColumnsActive('unVisible')">Unselect Visible</a>
+									<span><%selectItemTotalActive%>  Items selected</span>
+								</div>
+								<div class="filter-action">
+									<div class="action-left">
+										<select>
+											<option>Action</option>
+											<option>Action</option>
+											<option>Action</option>
+											<option>Action</option>
+										</select>
+										<!--- Active Setting panel -->
+										<span class="filter-action-icon" ng-show="tableFilterConfig" ng-click="tableFilterContainer = !tableFilterContainer"> <span class=""><img src="assets/images/filter.png" alt="" ></span> Filters </span>
+										<div class="setting" ng-if="tableSettingConfig">
+											<span class="setting icon-setting"> </span>
+										</div>
+									</div>
+									<div class="pull-right pager" ng-if="tableHeaderPaginationConfig">
+										<dir-header-pagination></dir-header-pagination>
+									</div>
+								</div>
+								<!-- Active section filter -->
+								<div class="filter-criteria" ng-show="tableFilterContainer">
+									<div ng-repeat="field in $root.filedsSet"  ng-if="field.filterable == true" class="col-sm-3">
+										<label><%field.fieldName%></label>
+										<input type="text" placeholder="0"  name="<%field.textBoxType%>" ng-model="filetrFileldName[field.fieldName]" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'single'"  ng-keyup="textChangeFunction(field.fieldName,$event)"/>
+										<!--
+										<input type="text" placeholder="from" name="<%field.textBoxType%>" ng-model="filetrFileldName[field.textBoxType]" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'" ng-keyup="textChangeFunction(field.fieldName+'_From',$event)">
+										<input type="text" placeholder="to" name="<%field.textBoxType%>" ng-model="filetrFileldName[field.textBoxType.to]" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'" ng-keyup="textChangeFunction(field.fieldName+'_To',$event)">-->
+										<input type="text" placeholder="from" name="<%field.textBoxType%>"  ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'" ng-keyup="textChangeFunction(field.fieldName+'_From',$event)">
+										<input type="text" placeholder="to" name="<%field.textBoxType%>"  ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'" ng-keyup="textChangeFunction(field.fieldName+'_To',$event)">
+
+										<select multiple ="multiple" ng-model="filterSelectBoxName[field.fieldName]" ng-options="opt.value for opt in field.optionArr track by field.optionArr.key"  ng-if="field.fieldType == 'selectbox' && field.optionValType == 'collection'" ng-change="filterSelectBoxChange()"></select>
+										<!-- <select-box-dir data-content="abcd" ng-if="field.fieldType == 'selectbox' && field.optionValType == 'url'" ng-if="$root.ready"></select-box-dir> -->
+										<!-- <select ng-model="selectBox1" ng-options="opt.value for opt in $root.optionJsonArr[1] track by $root.optionJsonArr[1].key"  ng-if="field.fieldType == 'selectbox' && field.optionValType == 'url'"></select> -->
+										<select ng-model="filterUrlSelectBoxModel" ng-if="field.fieldType == 'selectbox' && field.optionValType == 'url'" ng-bind-html="$root.optionHtml[$index]" ng-change="getSelectedOptionVal()"></select>
+									</div>
+									<div class="btn-row">
+										<button class="btn  btn-md">
+											Cancel
+										</button>
+										<button class="btn-md btn-skyblue" ng-click="getFilterDataFromServer()">
+											Apply Filters
+										</button>
+									</div>
+								</div>
+								<div class="table-resize">
+									<table id="activeTableTab" ui-grid="gridOptions" ui-grid-pagination="" class="grid" ng-if="tabActive"  ui-grid-resize-columns ui-grid-selection ui-grid-move-columns ui-grid-draggable-rows ui-grid-save-state></table>
+								</div>
+								<!-- pagination section -->
+								<div class="pagination">
+									<div class="text-center">
+										<pagination class="pagination-sm" total-items="gridOptions.totalItems" items-per-page="gridOptions.paginationPageSize" ng-model="gridOptions.paginationCurrentPage"></pagination>
+									</div>
+								</div>
+							</div>
+							<div id="create-sale-all" class="tab-pane fade">
+								<!-----table select all btn panel ----->
+								<div class="select-tag-btn" ng-if="tableSelectBtnConfig">
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectAllColumnFunAll('select')">Select All</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectAllColumnFunAll('unselect')">Unselect All</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectVisibleColumnsAll('visible')">Select Visible</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectVisibleColumnsAll('unVisible')">Unselect Visible</a>
+									<span><%selectItemTotalAll%> Items selected</span>
+								</div>
+								<div class="filter-action">
+									<div class="action-left">
+										<select>
+											<option>Action</option>
+											<option>Action</option>
+											<option>Action</option>
+											<option>Action</option>
+										</select>
+										<!-- all setting panel -->
+										<span class="filter-action-icon" ng-show="tableFilterConfig" ng-click="tableFilterContainer = !tableFilterContainer"> <span class=""><img src="assets/images/filter.png" alt=""></span> Filters </span>
+										<div class="setting" ng-if="tableSettingConfig">
+											<span class="setting icon-setting"> </span>
+										</div>
+									</div>
+									<div class="pull-right pager" ng-if="tableHeaderPaginationConfig">
+										<dir-header-pagination></dir-header-pagination>
+									</div>
+								</div>
+								<!-- All filter container section -->
+								<div class="filter-criteria" ng-show="tableFilterContainer">
+									<div ng-repeat="field in $root.filedsSet"  ng-if="field.filterable == true" class="col-sm-3">
+										<label><%field.fieldName%></label>
+										<input type="text" placeholder="0"  name="<%field.textBoxType%>" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'single'" get-inputfield-dir callback-fun="textChangeFunction(field.fieldName+'_ActFit'+$index,val)" />
+										<input type="text" placeholder="from" name="<%field.textBoxType%>" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'"  get-inputfield-dir callback-fun="textChangeFunction(field.fieldName+'_ActFitFrom'+$index,val)">
+										<input type="text" placeholder="to" name="<%field.textBoxType%>" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'"  get-inputfield-dir callback-fun="textChangeFunction(field.fieldName+'_ActFitTo'+$index,val)">
+										<select ng-model="selectBox" ng-options="opt.value for opt in field.optionArr track by field.optionArr.key"  ng-if="field.fieldType == 'selectbox' && field.optionValType == 'collection'"></select>
+										<select ng-model="selectBox1" ng-options="opt.value for opt in $root.optionJsonArr[0] track by $root.optionJsonArr[0].key"  ng-if="field.fieldType == 'selectbox' && field.optionValType == 'url'"></select>
+									</div>
+									<div class="btn-row">
+										<button class="btn  btn-md">
+											Cancel
+										</button>
+										<button class="btn-md btn-skyblue" ng-click="getFilterDataFromServer()">
+											Apply Filters
+										</button>
+									</div>
+
+								</div>
+								<!-- Table All page section-->
+								<div class="table-resize">
+									<table id="allTableTab" ui-grid="gridOptions" ui-grid-pagination="" class="grid" ng-if="tabAll"  ui-grid-resize-columns ui-grid-selection ui-grid-move-columns ui-grid-draggable-rows ui-grid-save-state></table>
+								</div>
+								<!-- pagination section -->
+								<div class="pagination">
+									<div class="text-center">
+										<pagination class="pagination-sm" total-items="gridOptions.totalItems" items-per-page="gridOptions.paginationPageSize" ng-model="gridOptions.paginationCurrentPage"></pagination>
+									</div>
+								</div>
+							</div>
+							<div id="filter-data" class="tab-pane fade">
+								<div class="filter-header" ng-include="'assets/js/App/View/filterHeader.html'"></div>
+								<!------- Table select btn filter panel---------->
+								<div class="select-tag-btn" ng-if="tableSelectBtnConfig">
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectAllColumnFunFilter('select')">Select All </a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectAllColumnFunFilter('unselect')">Unselect All</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectVisibleColumnsFilter('visible')">Select Visible</a>
+									<a href="javascript:void(0)" class="btn btn-md select-all" ng-click="selectVisibleColumnsFilter('unVisible')">Unselect Visible</a>
+									<span><%selectItemTotalFilter%> Items selected</span>
+								</div>
+								<div class="filter-action">
+									<div class="action-left">
+										<select>
+											<option>Action</option>
+											<option>Action</option>
+											<option>Action</option>
+											<option>Action</option>
+										</select>
+										<!-- filter setting panel -->
+										<span class="filter-action-icon" ng-show="tableFilterConfig" ng-click="tableFilterContainer = !tableFilterContainer"> <span class=""><img src="assets/images/filter.png" alt=""></span> Filters </span>
+										<div class="setting" ng-if="tableSettingConfig"></div>
+									</div>
+									<div class="pull-right pager" ng-if="tableHeaderPaginationConfig">
+										<dir-header-pagination></dir-header-pagination>
+									</div>
+								</div>
+								<!--- filter section filter container--->
+								<div class="filter-criteria" ng-show="tableFilterContainer">
+									<div ng-repeat="field in $root.filedsSet"  ng-if="field.filterable == true" class="col-sm-3">
+										<label><%field.fieldName%></label>
+										<input type="text" placeholder="0"  name="<%field.textBoxType%>" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'single'" get-inputfield-dir callback-fun="textChangeFunction(field.fieldName+'_ActFit'+$index,val)" />
+										<input type="text" placeholder="from" name="<%field.textBoxType%>" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'"  get-inputfield-dir callback-fun="textChangeFunction(field.fieldName+'_ActFitFrom'+$index,val)">
+										<input type="text" placeholder="to" name="<%field.textBoxType%>" ng-if="field.fieldType == 'textbox' && field.textBoxType == 'range'"  get-inputfield-dir callback-fun="textChangeFunction(field.fieldName+'_ActFitTo'+$index,val)">
+										<select ng-model="selectBox" ng-options="opt.value for opt in field.optionArr track by field.optionArr.key"  ng-if="field.fieldType == 'selectbox' && field.optionValType == 'collection'"></select>
+										<select ng-model="selectBox1" ng-options="opt.value for opt in $root.optionJsonArr[0] track by $root.optionJsonArr[0].key"  ng-if="field.fieldType == 'selectbox' && field.optionValType == 'url'"></select>
+									</div>
+									<div class="btn-row">
+										<button class="btn  btn-md">
+											Cancel
+										</button>
+										<button class="btn-md btn-skyblue" ng-click="getFilterDataFromServer()">
+											Apply Filters
+										</button>
+									</div>
+								</div>
+								<!-- Table filter section-->
+								<div class="table-resize">
+									<table id="filterTableTab" ui-grid="gridOptions" class="grid"  ui-grid-pagination="" ng-if="tabFilter"  ui-grid-resize-columns ui-grid-selection ui-grid-move-columns ui-grid-draggable-rows ui-grid-save-state></table>
+								</div>
+								<!-- pagination section -->
+								<div class="pagination">
+									<div class="text-center">
+										<pagination class="pagination-sm" total-items="gridOptions.totalItems" items-per-page="gridOptions.paginationPageSize" ng-model="gridOptions.paginationCurrentPage"></pagination>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Table section end -->
+
+				</div>
+			</section>
+
+			<div class="push-content"></div>
+
+		</div>
+		<!-- Content end -->
+		<script src="assets/js/App/Model/app.js"></script>
+		<script src="assets/js/App/Controller/mainController.js"></script>
+		<script src="assets/js/App/Directive/addClsModelShow.js"></script>
+		<script src="assets/js/App/Directive/singleInputBoxDir.js"></script>
+		<script src="assets/js/App/Service/table_service.js"></script>
+		<script type="text/javascript" src="assets/js/custom.js"></script>
+		<script type="text/javascript" src="assets/js/seller-custom.js"></script>
+
+	</body>
+</html>
